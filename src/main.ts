@@ -836,7 +836,7 @@ function setupRulesActions() {
       btn.classList.add('opacity-50');
 
       try {
-        const res = await fetch('http://localhost/AR_api/rules/add.php', {
+        const res = await fetch('/api/rules/add.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -877,7 +877,7 @@ function setupLogsActions() {
 
   const fetchLogs = async () => {
     try {
-      const res = await fetch('http://localhost/AR_api/logs/get.php?user_id=1');
+      const res = await fetch('/api/logs/get.php?user_id=1');
       const logs = await res.json();
 
       if (logs.length === 0) {
