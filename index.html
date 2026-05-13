@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="pl" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GhostApp | Home</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ccff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z'%3E%3C/path%3E%3Ccircle cx='9' cy='10' r='1.5' fill='%23ccff00' stroke='none'%3E%3C/circle%3E%3Ccircle cx='15' cy='10' r='1.5' fill='%23ccff00' stroke='none'%3E%3C/circle%3E%3C/svg%3E">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
+  </head>
+  <body class="relative min-h-screen bg-background text-white selection:bg-primary/30 selection:text-primary overflow-x-hidden">
+    
+    <!-- Background elements -->
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[-2]"></canvas>
+    <div class="fixed inset-0 bg-grid opacity-20 pointer-events-none z-[-1]"></div>
+    <div class="fixed inset-0 pointer-events-none z-[-1] transition-transform duration-75" id="mouse-glow"></div>
+    
+  <div id="app-container">
+    <!-- WIDOK: LANDING PAGE -->
+    <div id="landing-view">
+      <!-- Navbar -->
+      <ghost-navbar></ghost-navbar>>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex flex-col items-center justify-center pt-24 pb-12 px-6 relative text-center">
+      <div class="absolute inset-0 bg-primary/5 blur-[120px] rounded-full w-[800px] h-[800px] left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none z-[-1]"></div>
+      
+      <div class="max-w-4xl space-y-8 animate-slide-up z-10 mt-8 md:mt-0">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/10 text-primary text-xs font-mono uppercase tracking-wider mx-auto">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+          <span data-i18n="hero.badge">Terminal Gotowy do działania</span>
+        </div>
+        
+        <h1 class="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight">
+          <span data-i18n="hero.title.1">Scentralizuj swoją</span> <br class="hidden md:block" />
+          <span class="text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-500" data-i18n="hero.title.2">odpowiedź.</span>
+        </h1>
+        
+        <p data-i18n="hero.desc" class="text-lg md:text-xl text-zinc-400 font-sans max-w-2xl mx-auto leading-relaxed">
+          GhostApp to wysoce konfigurowalny system auto-respondera. Podepnij swoje konta Discord, Steam oraz Messenger i pozwól algorytmom zarządzać wiadomościami, gdy jesteś offline.
+        </p>
+
+        <div class="flex items-center justify-center gap-4 pt-4">
+          <button id="hero-register-btn" data-i18n="hero.register" class="px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-primary hover:shadow-[0_0_20px_rgba(204,255,0,0.3)] transition-all duration-300 text-base md:text-lg">
+            Załóż darmowe konto
+          </button>
+          <a href="#cechy" class="px-8 py-4 text-zinc-400 hover:text-white border border-white/10 rounded-lg hover:bg-white/5 transition-colors duration-300 text-base md:text-lg flex items-center gap-2">
+            <span data-i18n="hero.more">Dowiedz się więcej</span>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Auth Modal Overlay -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-100 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+      
+      <!-- Dedykowane tło, żeby uniknąć przypadkowego zamknięcia modala -->
+      <div id="auth-backdrop" class="absolute inset-0"></div>
+
+      <div id="terminal-auth" class="w-full max-w-md relative z-10 scale-95 transition-transform duration-300">
+        <!-- Close button -->
+        <button id="close-modal-btn" class="absolute -top-12 right-0 text-zinc-400 hover:text-white transition-colors p-2">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        
+        <div class="absolute -inset-1 bg-linear-to-b from-primary/20 to-transparent rounded-2xl blur-xl opacity-50 z-[-1]"></div>
+        
+        <div class="glass-panel p-8 md:p-10 relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
+          
+          <div class="mb-8">
+            <h2 id="form-title" data-i18n="auth.login.title" class="font-display text-3xl font-bold text-white mb-2 tracking-tight">Logowanie</h2>
+            <p id="form-subtitle" data-i18n="auth.login.sub" class="text-zinc-400 text-sm">Zaloguj się do swojego konta.</p>
+          </div>
+          
+          <form id="auth-form" class="space-y-5" autocomplete="off">
+            <div class="space-y-1">
+              <label data-i18n="auth.label.email" class="text-xs font-mono text-zinc-500 uppercase tracking-wider ml-1">E-Mail</label>
+              <div class="relative group">
+                <input id="email-input" type="email" autocomplete="off" data-lpignore="true" required class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="admin@ar.local">
+                <div class="absolute inset-0 rounded-lg ring-1 ring-white/5 pointer-events-none group-hover:ring-white/10 transition-all"></div>
+              </div>
+            </div>
+            
+            <div class="space-y-1">
+              <label data-i18n="auth.label.pass" class="text-xs font-mono text-zinc-500 uppercase tracking-wider ml-1">Hasło</label>
+              <div class="relative group">
+                <input id="pass-input" type="password" autocomplete="new-password" data-lpignore="true" required class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono" placeholder="••••••••••••">
+                <div class="absolute inset-0 rounded-lg ring-1 ring-white/5 pointer-events-none group-hover:ring-white/10 transition-all"></div>
+              </div>
+            </div>
+
+            <!-- CAPTCHA (widoczne tylko przy rejestracji) -->
+            <div id="captcha-container" class="hidden space-y-1 mt-4">
+              <div class="flex items-center gap-3 bg-black/40 border border-white/10 rounded-lg p-3 cursor-pointer group hover:border-primary/50 transition-colors" id="mock-captcha">
+                <div class="w-6 h-6 rounded border border-white/20 flex items-center justify-center group-hover:border-primary/50 transition-colors" id="captcha-checkbox">
+                   <svg id="captcha-check" class="w-4 h-4 text-primary opacity-0 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <span data-i18n="auth.robot" class="text-sm text-zinc-400 select-none">Nie jestem robotem</span>
+                <div class="ml-auto w-4 h-4 rounded-full border-2 border-t-primary border-r-primary border-b-transparent border-l-transparent animate-spin hidden" id="captcha-spinner"></div>
+              </div>
+              <p id="captcha-error" class="text-red-500 text-xs font-mono hidden ml-1">Wymagana weryfikacja.</p>
+            </div>
+
+            <!-- KOD WERYFIKACYJNY (widoczny w 2 kroku rejestracji) -->
+            <div id="verification-container" class="hidden space-y-1">
+              <label data-i18n="auth.label.code" class="text-xs font-mono text-zinc-500 uppercase tracking-wider ml-1">Kod Weryfikacyjny z E-Maila</label>
+              <div class="relative group">
+                <input id="code-input" type="text" maxlength="6" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-center tracking-[0.5em]" placeholder="000000">
+                <div class="absolute inset-0 rounded-lg ring-1 ring-white/5 pointer-events-none group-hover:ring-white/10 transition-all"></div>
+              </div>
+            </div>
+
+            <button type="submit" id="submit-btn" class="w-full bg-white text-black font-semibold rounded-lg px-4 py-3 mt-4 hover:bg-primary transition-all duration-300 relative overflow-hidden group">
+              <span id="btn-text" data-i18n="auth.login.btn" class="relative z-10 flex items-center justify-center gap-2">
+                Zaloguj się
+              </span>
+              <div class="absolute inset-0 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+            </button>
+          </form>
+
+          <div class="mt-8 pt-6 border-t border-white/5 text-center">
+            <button id="toggle-mode-btn" data-i18n="auth.toggle.toReg" type="button" class="text-sm text-zinc-500 hover:text-white transition-colors cursor-pointer border-b border-transparent hover:border-white/20 pb-0.5">
+              Nie masz konta? Zarejestruj się.
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <section id="cechy" class="py-32 px-6 max-w-7xl mx-auto border-t border-white/5">
+      <div class="text-center mb-20 reveal">
+        <h2 data-i18n="features.title" class="font-display text-4xl md:text-5xl font-bold mb-4">Wielowątkowy protokół</h2>
+        <p data-i18n="features.desc" class="text-zinc-400 max-w-xl mx-auto text-lg">Twój czas jest zbyt cenny, by odpowiadać na wciąż te same wiadomości. Zbudowaliśmy ekosystem, który rozwiązuje ten problem.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass-panel p-8 group hover:-translate-y-2 transition-transform duration-500 reveal" style="transition-delay: 100ms;">
+          <div class="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 data-i18n="feature1.title" class="text-xl font-bold text-white mb-3">Pojedynczy Terminal</h3>
+          <p data-i18n="feature1.desc" class="text-zinc-400 leading-relaxed text-sm">
+            Zarządzaj wszystkimi konwersacjami z poziomu jednego szyfrowanego dashboardu. Koniec z przeskakiwaniem między aplikacjami.
+          </p>
+        </div>
+
+        <div class="glass-panel p-8 group hover:-translate-y-2 transition-transform duration-500 reveal" style="transition-delay: 200ms;">
+          <div class="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 data-i18n="feature2.title" class="text-xl font-bold text-white mb-3">Własne Reguły (Triggery)</h3>
+          <p data-i18n="feature2.desc" class="text-zinc-400 leading-relaxed text-sm">
+            Definiuj filtry słów kluczowych. Gdy bot wykryje np. słowo "trade" na Steamie, natychmiast wyśle przygotowany komunikat bez Twojej ingerencji.
+          </p>
+        </div>
+
+        <div class="glass-panel p-8 group hover:-translate-y-2 transition-transform duration-500 reveal" style="transition-delay: 300ms;">
+          <div class="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <h3 data-i18n="feature3.title" class="text-xl font-bold text-white mb-3">Pełna Dyskrecja</h3>
+          <p data-i18n="feature3.desc" class="text-zinc-400 leading-relaxed text-sm">
+            Zaszyfrowane logi i lokalne przechowywanie kluczy (JWT). Twoja prywatność to rdzeń naszego systemu komunikacyjnego.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-32 px-6 max-w-4xl mx-auto border-t border-white/5">
+      <div class="text-center mb-16 reveal">
+        <h2 data-i18n="faq.title" class="font-display text-4xl font-bold mb-4">Najczęściej zadawane pytania (FAQ)</h2>
+        <p data-i18n="faq.desc" class="text-zinc-400">Wszystko, co musisz wiedzieć o architekturze GhostApp.</p>
+      </div>
+
+      <div class="space-y-6">
+        <div class="glass-panel p-6 reveal" style="transition-delay: 100ms;">
+          <h4 data-i18n="faq1.q" class="text-lg font-bold text-white mb-2">Czy muszę udostępniać swoje hasła platformom?</h4>
+          <p data-i18n="faq1.a" class="text-zinc-400 text-sm leading-relaxed">Nie. GhostApp nie wymaga twoich osobistych haseł. Do połączenia węzłów używamy wyłącznie tokenów API botów (np. Discord Bot Token) wygenerowanych w portalu dewelopera dla konkretnej platformy.</p>
+        </div>
+        
+        <div class="glass-panel p-6 reveal" style="transition-delay: 200ms;">
+          <h4 data-i18n="faq2.q" class="text-lg font-bold text-white mb-2">Jak działają Triggery?</h4>
+          <p data-i18n="faq2.a" class="text-zinc-400 text-sm leading-relaxed">W zakładce 'Reguły' w swoim Terminalu (Dashboardzie) definiujesz słowa kluczowe (np. "afk", "trade"). Gdy algorytm przechwyci taką wiadomość, system automatycznie odpowiada na nią przygotowanym tekstem.</p>
+        </div>
+        
+        <div class="glass-panel p-6 reveal" style="transition-delay: 300ms;">
+          <h4 data-i18n="faq3.q" class="text-lg font-bold text-white mb-2">Gdzie przechowywane są dane?</h4>
+          <p data-i18n="faq3.a" class="text-zinc-400 text-sm leading-relaxed">Wiadomości podlegają jedynie logowaniu i przechowywane są w zabezpieczonej bazie MySQL. Hasło do Twojego terminala jest hashowane szyfrowaniem BCRYPT. Kod nie może zostać odszyfrowany nawet przez administratorów.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer data-i18n="footer.text" class="border-t border-white/5 py-8 text-center text-zinc-600 text-sm font-mono">
+      &copy; 2026 GhostApp. System operacyjny komunikacji.
+    </footer>
+    </div> <!-- KONIEC LANDING VIEW -->
+
+    <!-- WIDOK: DASHBOARD -->
+    <div id="dashboard-view" class="hidden">
+      <!-- Dashboard Background -->
+      <div class="fixed inset-0 bg-grid opacity-10 pointer-events-none z-[-1]"></div>
+      
+      <!-- Security Overlay (Visible until JS auth confirms) -->
+      <div id="auth-overlay" class="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center" style="display: none;">
+        <div class="w-12 h-12 border-t-2 border-primary rounded-full animate-spin"></div>
+        <p data-i18n="dash.overlay.verify" class="mt-4 font-mono text-xs text-zinc-500 uppercase tracking-widest">Weryfikacja tokenu...</p>
+      </div>
+
+      <div class="flex h-screen animate-fade-in" style="opacity: 0;" id="app-content">
+
+        <!-- Sidebar Component -->
+        <ghost-sidebar></ghost-sidebar>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col relative z-10">
+          <!-- Topbar -->
+          <header class="h-16 border-b border-white/5 flex items-center px-8 justify-between bg-black/20 backdrop-blur-md relative z-20">
+            <h1 id="topbar-title" data-i18n="dash.topbar.title" class="text-xl font-display font-bold text-white">Dziennik Zdarzeń (Inbox)</h1>
+            <div class="flex items-center gap-3">
+              <ghost-lang-switcher></ghost-lang-switcher>
+            </div>
+          </header>
+
+          <!-- Views Container -->
+          <div class="flex-1 relative overflow-y-auto overflow-x-hidden">
+            
+            <!-- VIEW: EVENTS -->
+            <div id="view-events" class="p-8">
+            <!-- Stats Row -->
+            <div class="grid grid-cols-3 gap-6 mb-8">
+              <div class="glass-panel p-5">
+                <p data-i18n="dash.stats.actions" class="text-xs font-mono text-zinc-500 mb-1">Dzisiejsze Akcje</p>
+                <p class="text-3xl font-display text-white">124</p>
+              </div>
+              <div class="glass-panel p-5">
+                <p data-i18n="dash.stats.efficiency" class="text-xs font-mono text-zinc-500 mb-1">Skuteczność Auto-odpowiedzi</p>
+                <p class="text-3xl font-display text-primary">98.5%</p>
+              </div>
+              <div class="glass-panel p-5 flex flex-col justify-center">
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-zinc-400">Discord</span>
+                  <span data-i18n="dash.stats.connected" class="text-discord font-bold">Połączony</span>
+                </div>
+                <div class="flex justify-between items-center text-sm mt-2">
+                  <span class="text-zinc-400">Steam</span>
+                  <span data-i18n="dash.stats.connected" class="text-steamLight font-bold">Połączony</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message Logs -->
+            <div class="glass-panel overflow-hidden">
+              <div class="px-6 py-4 border-b border-white/5 bg-white/2">
+                <h3 data-i18n="dash.logs.title" class="text-sm font-medium text-white">Ostatnie Interwencje</h3>
+              </div>
+              <div class="divide-y divide-white/5" id="log-container">
+                <!-- MOCK LOGS injected via JS -->
+              </div>
+            </div>
+            </div> <!-- END VIEW: EVENTS -->
+
+            <!-- VIEW: CONFIG -->
+            <div id="view-config" class="p-8 hidden">
+              <div class="max-w-4xl mx-auto space-y-6">
+                
+                <div class="mb-8">
+                  <h2 class="text-2xl font-display font-bold text-white mb-2">Konfiguracja Połączeń</h2>
+                  <p class="text-zinc-400">Zarządzaj swoimi kluczami API i połączeniami do platform zewnętrznych.</p>
+                </div>
+
+                <!-- Discord Config Card — ACTIVE -->
+                <div class="glass-panel p-6 relative overflow-x-hidden group">
+                  <div class="absolute -inset-1 bg-linear-to-r from-discord/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-discord/10 border border-discord/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/discord.png" alt="Discord" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">Discord (Self-Bot)</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary border border-primary/30 rounded-full">Aktywny</span>
+                      </div>
+                      <p class="text-sm text-zinc-400 mb-4">Wklej swój <span class="text-white">User Token</span>, aby auto-responder mógł działać na Twoim koncie.</p>
+                      
+                      <div class="flex flex-col md:flex-row gap-3 mb-4">
+                        <div class="relative flex-1">
+                          <input type="password" id="discord-token-input" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-discord/50 transition-colors font-mono placeholder-zinc-600" placeholder="NTEy... (User Token)">
+                        </div>
+                        <select id="discord-scope-select" class="bg-black/50 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-discord/50 transition-colors cursor-pointer appearance-none min-w-[180px]">
+                          <option value="dm_only">Tylko DM</option>
+                          <option value="all">Wszystkie (DM + Serwery)</option>
+                        </select>
+                        <button id="discord-save-btn" class="px-6 py-2.5 bg-discord/20 hover:bg-discord text-white border border-discord/30 hover:border-discord rounded-lg text-sm font-semibold transition-all shadow-[0_0_15px_rgba(88,101,242,0)] hover:shadow-[0_0_15px_rgba(88,101,242,0.4)] shrink-0">
+                          Zapisz Token
+                        </button>
+                      </div>
+
+                      <!-- AI Config Section -->
+                      <div class="mt-6 pt-6 border-t border-white/5 space-y-4">
+                        <div class="flex items-center gap-3 mb-2">
+                          <input type="checkbox" id="discord-ai-enabled" class="w-4 h-4 accent-brand bg-black/50 border-white/10 rounded cursor-pointer">
+                          <label for="discord-ai-enabled" class="text-sm font-medium text-white cursor-pointer flex items-center gap-2">
+                            <span class="text-brand">✨</span> Włącz Google Gemini AI (Odpowiada gdy brakuje reguł)
+                          </label>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label class="block text-xs font-medium text-zinc-500 mb-1">Google Gemini API Key</label>
+                            <input type="password" id="discord-ai-key-input" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-brand/50 transition-colors font-mono placeholder-zinc-700" placeholder="AIzaSy...">
+                          </div>
+                          <div>
+                            <label class="block text-xs font-medium text-zinc-500 mb-1">Zachowanie Bota (Prompt systemowy)</label>
+                            <input type="text" id="discord-ai-prompt-input" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-brand/50 transition-colors placeholder-zinc-700" placeholder="np. Jesteś asystentem. Odpowiadaj krótko i na luzie.">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Toggle Guide Button -->
+                      <button id="discord-guide-toggle" class="flex items-center gap-2 text-xs text-discord/70 hover:text-discord transition-colors cursor-pointer group/guide mt-4">
+                        <svg class="w-4 h-4 transition-transform duration-300" id="discord-guide-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <span>Jak uzyskać User Token?</span>
+                      </button>
+
+                      <!-- Collapsible Guide -->
+                      <div id="discord-guide-content" class="hidden mt-4">
+                        <div class="bg-black/40 border border-white/5 rounded-xl p-5 space-y-4">
+                          
+                          <!-- Step 1 -->
+                          <div class="flex gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-discord/20 border border-discord/30 flex items-center justify-center shrink-0 text-xs font-bold text-discord">1</div>
+                            <div>
+                              <p class="text-sm text-white font-medium">Otwórz Discord w przeglądarce</p>
+                              <p class="text-xs text-zinc-500 mt-0.5">Wejdź na <a href="https://discord.com/app" target="_blank" rel="noopener" class="text-discord hover:underline">discord.com/app</a> i zaloguj się na swoje konto.</p>
+                            </div>
+                          </div>
+
+                          <!-- Step 2 -->
+                          <div class="flex gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-discord/20 border border-discord/30 flex items-center justify-center shrink-0 text-xs font-bold text-discord">2</div>
+                            <div>
+                              <p class="text-sm text-white font-medium">Otwórz DevTools</p>
+                              <p class="text-xs text-zinc-500 mt-0.5">Naciśnij 
+                                <kbd class="px-1.5 py-0.5 bg-zinc-800 border border-zinc-700 rounded text-[10px] font-mono text-zinc-300">F12</kbd>
+                                , następnie przejdź do zakładki
+                                <span class="text-white font-medium"> Application</span>.
+                              </p>
+                            </div>
+                          </div>
+
+                          <!-- Step 3 -->
+                          <div class="flex gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-discord/20 border border-discord/30 flex items-center justify-center shrink-0 text-xs font-bold text-discord">3</div>
+                            <div>
+                              <p class="text-sm text-white font-medium">Znajdź token w Local Storage</p>
+                              <p class="text-xs text-zinc-500 mt-0.5">W panelu po lewej rozwiń 
+                                <span class="text-white font-medium">Local Storage</span> → kliknij 
+                                <span class="text-discord font-medium">https://discord.com</span>
+                              </p>
+                              <p class="text-xs text-zinc-500 mt-1">W tabeli po prawej znajdź wiersz z kluczem <span class="text-white font-mono">token</span>.</p>
+                            </div>
+                          </div>
+
+                          <!-- Step 4 -->
+                          <div class="flex gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 text-xs font-bold text-primary">4</div>
+                            <div>
+                              <p class="text-sm text-white font-medium">Skopiuj wartość i wklej powyżej</p>
+                              <p class="text-xs text-zinc-500 mt-0.5">Dwukrotnie kliknij wartość tokena, skopiuj ją (<kbd class="px-1.5 py-0.5 bg-zinc-800 border border-zinc-700 rounded text-[10px] font-mono text-zinc-300">Ctrl+C</kbd>) i wklej w pole powyżej. <span class="text-zinc-400">Usuń cudzysłowy jeśli się pojawią.</span></p>
+                            </div>
+                          </div>
+
+                          <!-- Warning -->
+                          <div class="flex gap-2 mt-2 p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                            <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <p class="text-[11px] text-red-400/80 leading-relaxed"><strong>Uwaga:</strong> Nigdy nie udostępniaj tokena osobom trzecim. Self-botting narusza ToS Discorda — korzystasz na własną odpowiedzialność.</p>
+                          </div>
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Steam Config Card — COMING SOON -->
+                <div class="glass-panel p-6 relative overflow-hidden group opacity-60">
+                  <div class="absolute -inset-1 bg-linear-to-r from-steamLight/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-steamLight/10 border border-steamLight/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/steam.png" alt="Steam" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">Steam</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full">Wkrótce</span>
+                      </div>
+                      <p class="text-sm text-zinc-500">Auto-odpowiedzi na wiadomości Steam. Integracja w przygotowaniu.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Messenger Config Card — COMING SOON -->
+                <div class="glass-panel p-6 relative overflow-hidden group opacity-60">
+                  <div class="absolute -inset-1 bg-linear-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/messenger.png" alt="Messenger" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">Messenger</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full">Wkrótce</span>
+                      </div>
+                      <p class="text-sm text-zinc-500">Auto-odpowiedzi na wiadomości Facebook Messenger.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Facebook Config Card — COMING SOON -->
+                <div class="glass-panel p-6 relative overflow-hidden group opacity-60">
+                  <div class="absolute -inset-1 bg-linear-to-r from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-600/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/facebook.png" alt="Facebook" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">Facebook</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full">Wkrótce</span>
+                      </div>
+                      <p class="text-sm text-zinc-500">Automatyczne odpowiedzi na komentarze i wiadomości na Facebooku.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Instagram Config Card — COMING SOON -->
+                <div class="glass-panel p-6 relative overflow-hidden group opacity-60">
+                  <div class="absolute -inset-1 bg-linear-to-r from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/instagram.png" alt="Instagram" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">Instagram</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full">Wkrótce</span>
+                      </div>
+                      <p class="text-sm text-zinc-500">Auto-odpowiedzi na DM i komentarze na Instagramie.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TikTok Config Card — COMING SOON -->
+                <div class="glass-panel p-6 relative overflow-hidden group opacity-60">
+                  <div class="absolute -inset-1 bg-linear-to-r from-cyan-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/tiktok.png" alt="TikTok" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">TikTok</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full">Wkrótce</span>
+                      </div>
+                      <p class="text-sm text-zinc-500">Auto-odpowiedzi na komentarze i wiadomości TikTok.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Twitch Config Card — COMING SOON -->
+                <div class="glass-panel p-6 relative overflow-hidden group opacity-60">
+                  <div class="absolute -inset-1 bg-linear-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/twitch.png" alt="Twitch" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">Twitch</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full">Wkrótce</span>
+                      </div>
+                      <p class="text-sm text-zinc-500">Auto-moderacja i odpowiedzi na czacie Twitch.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TeamSpeak 3 Config Card — COMING SOON -->
+                <div class="glass-panel p-6 relative overflow-hidden group opacity-60">
+                  <div class="absolute -inset-1 bg-linear-to-r from-indigo-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-[-1]"></div>
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-400/10 border border-indigo-400/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src="/src/assets/sociale/ts3.png" alt="TeamSpeak 3" class="w-7 h-7 object-contain">
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-white">TeamSpeak 3</h3>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-full">Wkrótce</span>
+                      </div>
+                      <p class="text-sm text-zinc-500">Auto-odpowiedzi na wiadomości prywatne w TeamSpeak 3.</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- VIEW: RULES -->
+            <div id="view-rules" class="p-8 hidden">
+              <div class="max-w-5xl mx-auto">
+                <div class="mb-8">
+                  <h2 class="text-2xl font-display font-bold text-white mb-2">Zarządzanie Regułami</h2>
+                  <p class="text-zinc-400 text-sm">Definiuj słowa kluczowe i automatyczne odpowiedzi, które bot wyśle, gdy wykryje je w wiadomości.</p>
+                </div>
+
+                <!-- Add Rule Form -->
+                <div class="glass-panel p-6 mb-8">
+                  <h3 class="text-lg font-bold text-white mb-4">Dodaj nową regułę</h3>
+                  <form id="add-rule-form" class="flex flex-col md:flex-row gap-4 items-start">
+                    <div class="flex-1 w-full">
+                      <label class="block text-xs font-medium text-zinc-400 mb-1">Platforma</label>
+                      <select id="rule-platform" class="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer appearance-none">
+                        <option value="discord">Discord</option>
+                        <!-- In the future we will add Steam, Messenger, etc. -->
+                      </select>
+                    </div>
+                    <div class="flex-1 w-full">
+                      <label class="block text-xs font-medium text-zinc-400 mb-1">Słowo kluczowe (Trigger)</label>
+                      <input type="text" id="rule-trigger" required placeholder="np. !pomoc, cena, kontakt" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors placeholder-zinc-600">
+                    </div>
+                    <div class="flex-2 w-full">
+                      <label class="block text-xs font-medium text-zinc-400 mb-1">Odpowiedź bota</label>
+                      <input type="text" id="rule-reply" required placeholder="Odpowiedź bota na wiadomość..." class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors placeholder-zinc-600">
+                    </div>
+                    <div class="w-full md:w-auto md:self-end pt-5 md:pt-0">
+                      <button type="submit" id="rule-add-btn" class="w-full px-6 py-2.5 bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/30 hover:border-primary rounded-lg text-sm font-bold transition-all shadow-[0_0_15px_rgba(204,255,0,0)] hover:shadow-[0_0_15px_rgba(204,255,0,0.4)] shrink-0">
+                        Dodaj regułę
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Rules List -->
+                <div class="glass-panel overflow-hidden">
+                  <div class="px-6 py-4 border-b border-white/5 bg-white/2 flex justify-between items-center">
+                    <h3 class="text-sm font-medium text-white">Aktywne Reguły</h3>
+                    <button id="refresh-rules-btn" class="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Odśwież
+                    </button>
+                  </div>
+                  <div class="divide-y divide-white/5" id="rules-container">
+                    <div class="p-8 text-center text-zinc-500 text-sm font-mono flex flex-col items-center justify-center">
+                      <div class="w-8 h-8 border-2 border-zinc-700 border-t-zinc-400 rounded-full animate-spin mb-3"></div>
+                      Ładowanie reguł...
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+      </div>
+    </div> <!-- KONIEC DASHBOARD VIEW -->
+  </div> <!-- KONIEC APP CONTAINER -->
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<?php
+// POST /api/discord/connect — zapisz bot token w user_platforms
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json; charset=UTF-8");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
+
+include_once '../config/Database.php';
+
+$database = new Database();
+$conn = $database->getConnection();
+
+$data = json_decode(file_get_contents("php://input"));
+
+if (!$data || empty($data->user_id) || empty($data->bot_token)) {
+    http_response_code(400);
+    echo json_encode(["error" => "user_id i bot_token są wymagane"]);
+    exit;
+}
+
+$userId = (int)$data->user_id;
+$botToken = trim($data->bot_token);
+$botScope = !empty($data->bot_scope) ? trim($data->bot_scope) : 'all';
+
+$aiApiKey = isset($data->ai_api_key) ? trim($data->ai_api_key) : null;
+$aiPrompt = isset($data->ai_prompt) ? trim($data->ai_prompt) : null;
+$aiEnabled = isset($data->ai_enabled) ? (int)$data->ai_enabled : 0;
+
+try {
+    // Upsert — jeśli wpis discord już istnieje, nadpisz token
+    $check = $conn->prepare("SELECT id FROM user_platforms WHERE user_id = ? AND platform_name = 'discord'");
+    $check->execute([$userId]);
+
+    if ($check->rowCount() > 0) {
+        $stmt = $conn->prepare("UPDATE user_platforms SET access_token = ?, bot_scope = ?, ai_api_key = ?, ai_prompt = ?, ai_enabled = ?, status = 'active', updated_at = NOW() WHERE user_id = ? AND platform_name = 'discord'");
+        $stmt->execute([$botToken, $botScope, $aiApiKey, $aiPrompt, $aiEnabled, $userId]);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO user_platforms (user_id, platform_name, access_token, bot_scope, ai_api_key, ai_prompt, ai_enabled, status) VALUES (?, 'discord', ?, ?, ?, ?, ?, 'active')");
+        $stmt->execute([$userId, $botToken, $botScope, $aiApiKey, $aiPrompt, $aiEnabled]);
+    }
+
+    // Dodaj log systemowy
+    $log = $conn->prepare("INSERT INTO event_logs (user_id, platform, event_type, source_user, trigger_keyword) VALUES (?, 'discord', 'system', 'SYSTEM', 'BOT_CONNECTED')");
+    $log->execute([$userId]);
+
+    echo json_encode(["success" => true, "message" => "Zapisano User Token i zakres działania (Scope: $botScope)"]);
+
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(["error" => $e->getMessage()]);
+}
+?>
