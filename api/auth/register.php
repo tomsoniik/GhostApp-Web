@@ -11,8 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-include_once '../config/Database.php';
-include_once '../models/User.php';
+include_once __DIR__ . '/../config/Database.php';
+include_once __DIR__ . '/../models/User.php';
 
 $database = new Database();
 $db = $database->getConnection();

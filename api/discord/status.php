@@ -7,7 +7,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
-include_once '../config/Database.php';
+include_once __DIR__ . '/../config/Database.php';
 
 $database = new Database();
 $conn = $database->getConnection();
