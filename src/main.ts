@@ -1193,7 +1193,7 @@ function setupLogsActions() {
 
   const fetchLogs = async () => {
     try {
-      const res = await fetch(API_BASE_URL + "/logs/get.php?user_id=1');
+      const res = await fetch(API_BASE_URL + "/logs/get.php?user_id=1");
       const logs = await res.json();
 
       if (logs.length === 0) {
