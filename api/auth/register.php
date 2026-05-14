@@ -21,10 +21,11 @@ $user = new User($db);
 // Odbieranie danych z JSON (fetch frontendowy)
 $data = json_decode(file_get_contents("php://input"));
 
-if(!empty($data->email) && !empty($data->password) && !empty($data->username)) {
+if(!empty($data->email) && !empty($data->password) && !empty($data->username) && !empty($data->code)) {
     $user->username = $data->username;
     $user->email = $data->email;
     $user->password = $data->password;
+    $code = trim($data->code);
 
     // Walidacja długości username (3-24 znaki)
     if(strlen($data->username) < 3 || strlen($data->username) > 24) {
@@ -54,6 +55,28 @@ if(!empty($data->email) && !empty($data->password) && !empty($data->username)) {
         exit();
     }
 
+    // ─── Weryfikacja kodu z bazy danych ───
+    try {
+        $stmt = $db->prepare("SELECT id FROM verification_codes WHERE email = ? AND code = ? AND used = 0 AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1");
+        $stmt->execute([$data->email, $code]);
+
+        if ($stmt->rowCount() === 0) {
+            http_response_code(400);
+            echo json_encode(array("message" => "Nieprawidłowy lub wygasły kod weryfikacyjny."));
+            exit();
+        }
+
+        // Oznacz kod jako użyty
+        $codeRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        $markUsed = $db->prepare("UPDATE verification_codes SET used = 1 WHERE id = ?");
+        $markUsed->execute([$codeRow['id']]);
+
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(array("message" => "Błąd weryfikacji kodu."));
+        exit();
+    }
+
     if($user->create()) {
         http_response_code(201);
         echo json_encode(array("message" => "Tożsamość została zainicjowana z sukcesem."));
@@ -63,6 +86,6 @@ if(!empty($data->email) && !empty($data->password) && !empty($data->username)) {
     }
 } else {
     http_response_code(400);
-    echo json_encode(array("message" => "Niekompletne dane wejściowe. Podaj nazwę użytkownika, email i hasło."));
+    echo json_encode(array("message" => "Niekompletne dane wejściowe. Podaj nazwę użytkownika, email, hasło i kod weryfikacyjny."));
 }
 ?>

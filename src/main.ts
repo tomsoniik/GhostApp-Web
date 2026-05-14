@@ -397,7 +397,6 @@ function setupAuth() {
           if (!isLoginMode && registrationStep === 1) {
             // Sukces wyslania kodu
             submitBtn.innerHTML = `<span class="text-primary font-bold flex justify-center w-full">KOD WYSŁANY</span>`;
-            console.log('DEV ONLY - Kod weryfikacyjny:', data.dev_code);
             
             setTimeout(() => {
               registrationStep = 2;
