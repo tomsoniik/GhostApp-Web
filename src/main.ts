@@ -4,6 +4,9 @@ import './components/GhostSidebar';
 import './components/GhostLangSwitcher';
 import { initI18n, t } from './i18n';
 
+// CONFIG: Base URL for API calls
+const API_BASE_URL = 'https://ghostapp-production.up.railway.app/api';
+
 function setupBackground() {
   // Mouse Glow Tracking
   const mouseGlow = document.getElementById('mouse-glow');
@@ -368,9 +371,8 @@ function setupAuth() {
       submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
       try {
-        // Twój pełny adres Railway
-        const baseUrl = 'https://ghostapp-production.up.railway.app/api/auth';
-        let endpoint = baseUrl;
+        const endpointBase = `${API_BASE_URL}/auth`;
+        let endpoint = endpointBase;
         let payload: any = {};
 
         if (isLoginMode) {
@@ -503,7 +505,7 @@ async function loadDashboardLogs() {
 
   // TODO: docelowo user_id z tokenu JWT, na razie 1
   const userId = 1;
-  const API_BASE = '/api';
+  const API_BASE = API_BASE_URL;
 
   try {
     const res = await fetch(`${API_BASE}/logs/list.php?user_id=${userId}&limit=50`);
