@@ -828,6 +828,9 @@ function setupConfigActions() {
   const aiKeyInput = document.getElementById('discord-ai-key-input') as HTMLInputElement;
   const aiPromptInput = document.getElementById('discord-ai-prompt-input') as HTMLInputElement;
 
+  const afkEnabledCheckbox = document.getElementById('afk-enabled') as HTMLInputElement;
+  const afkMessageInput = document.getElementById('afk-message') as HTMLInputElement;
+
   // Wczytaj zapisane klucze przy ładowaniu
   const fetchConfig = async () => {
     try {
@@ -850,6 +853,12 @@ function setupConfigActions() {
         }
         if (aiPromptInput && platforms['discord'].ai_prompt) {
           aiPromptInput.value = platforms['discord'].ai_prompt;
+        }
+        if (afkEnabledCheckbox) {
+          afkEnabledCheckbox.checked = platforms['discord'].afk_enabled;
+        }
+        if (afkMessageInput && platforms['discord'].afk_message) {
+          afkMessageInput.value = platforms['discord'].afk_message;
         }
       }
     } catch (err) {
@@ -901,6 +910,8 @@ function setupConfigActions() {
       const aiEnabled = aiEnabledCheckbox?.checked ? 1 : 0;
       const aiKey = aiKeyInput?.value || '';
       const aiPrompt = aiPromptInput?.value || '';
+      const afkEnabled = afkEnabledCheckbox?.checked ? 1 : 0;
+      const afkMessage = afkMessageInput?.value || '';
 
       if (!token) return;
 
@@ -919,7 +930,9 @@ function setupConfigActions() {
             bot_scope: scope,
             ai_enabled: aiEnabled,
             ai_api_key: aiKey,
-            ai_prompt: aiPrompt
+            ai_prompt: aiPrompt,
+            afk_enabled: afkEnabled,
+            afk_message: afkMessage
           })
         });
 
