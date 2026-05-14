@@ -36,35 +36,35 @@ try {
     $stmt = $conn->prepare("INSERT INTO verification_codes (email, code, expires_at) VALUES (?, ?, ?)");
     $stmt->execute([$email, $code, $expiresAt]);
 
-    // ─── Wysyłka maila przez Resend API ───
-    $RESEND_API_KEY = 're_PLACEHOLDER'; // TODO: Wstaw swój klucz Resend API
+    // ─── Wysyłka maila przez Brevo API ───
+    $BREVO_API_KEY = 'xsmtpsib-052468208b762fa680c38fc58bfc9e73cf155974abd2bb056b90ac5aa8c3c240-zV3JHRUtBvKMuwzo';
+    
+    // TODO: Zmień na swój zweryfikowany email w Brevo!
+    $senderEmail = 'debskitomal@gmail.com'; 
 
     $emailPayload = json_encode([
-        "from" => "GhostApp <noreply@ghostapp.dev>",
-        "to" => [$email],
+        "sender" => ["name" => "GhostApp", "email" => $senderEmail],
+        "to" => [["email" => $email]],
         "subject" => "GhostApp — Kod weryfikacyjny",
-        "html" => "
-            <div style='font-family: Inter, sans-serif; background: #0a0a0a; color: #fff; padding: 40px; border-radius: 12px; max-width: 480px; margin: 0 auto;'>
-                <div style='text-align: center; margin-bottom: 24px;'>
-                    <h1 style='color: #ccff00; font-size: 28px; margin: 0;'>GhostApp</h1>
-                    <p style='color: #888; font-size: 13px; margin-top: 4px;'>System Automatyzacji</p>
+        "htmlContent" => "
+            <div style='font-family: Arial, sans-serif; background-color: #050505; color: #ffffff; padding: 50px; text-align: center; border-radius: 15px;'>
+                <h1 style='color: #ccff00; font-size: 32px; letter-spacing: -1px;'>GhostApp</h1>
+                <p style='color: #888; font-size: 16px;'>Twój bezpieczny kod dostępu do systemu:</p>
+                <div style='background: #111; border: 2px solid #222; display: inline-block; padding: 20px 40px; margin: 20px 0; border-radius: 10px;'>
+                    <span style='font-size: 42px; font-weight: 900; color: #ccff00; letter-spacing: 10px; font-family: monospace;'>$code</span>
                 </div>
-                <div style='background: #111; border: 1px solid #222; border-radius: 8px; padding: 24px; text-align: center;'>
-                    <p style='color: #aaa; font-size: 14px; margin: 0 0 16px;'>Twój kod weryfikacyjny:</p>
-                    <div style='font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #ccff00; font-family: monospace; padding: 12px 0;'>$code</div>
-                    <p style='color: #666; font-size: 12px; margin: 16px 0 0;'>Kod ważny przez 10 minut.</p>
-                </div>
-                <p style='color: #555; font-size: 11px; text-align: center; margin-top: 24px;'>Jeśli to nie Ty — zignoruj tę wiadomość.</p>
+                <p style='color: #555; font-size: 12px;'>Kod wygaśnie za 10 minut. Jeśli to nie Ty, zignoruj tę wiadomość.</p>
             </div>
         "
     ]);
 
-    $ch = curl_init('https://api.resend.com/emails');
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
     curl_setopt_array($ch, [
         CURLOPT_POST => true,
         CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $RESEND_API_KEY,
-            'Content-Type: application/json'
+            'api-key: ' . $BREVO_API_KEY,
+            'Content-Type: application/json',
+            'Accept: application/json'
         ],
         CURLOPT_POSTFIELDS => $emailPayload,
         CURLOPT_RETURNTRANSFER => true,
@@ -73,18 +73,15 @@ try {
     
     $result = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpCode >= 200 && $httpCode < 300) {
         http_response_code(200);
-        echo json_encode(["message" => "Kod weryfikacyjny został wysłany na e-mail."]);
+        echo json_encode(["message" => "Kod został wysłany."]);
     } else {
-        // Fallback: mimo błędu wysyłki, kod jest w bazie — pozwalamy kontynuować
-        http_response_code(200);
-        echo json_encode([
-            "message" => "Kod weryfikacyjny został wysłany na e-mail.",
-            "warning" => "Email delivery may be delayed."
-        ]);
+        // Log błędu dla Ciebie (widoczny tylko w konsoli sieciowej)
+        error_log("Brevo Error: " . $result);
+        http_response_code(200); // Zwracamy 200, żeby frontend nie wyrzucił błędu, ale logujemy problem
+        echo json_encode(["message" => "Kod został wygenerowany (sprawdź e-mail).", "dev_info" => "Brevo API status: $httpCode"]);
     }
 
 } catch (PDOException $e) {

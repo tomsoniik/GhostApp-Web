@@ -368,7 +368,8 @@ function setupAuth() {
       submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
       try {
-        const baseUrl = '/api/auth';
+        // Twój pełny adres Railway
+        const baseUrl = 'https://ghostapp-production.up.railway.app/api/auth';
         let endpoint = baseUrl;
         let payload: any = {};
 
