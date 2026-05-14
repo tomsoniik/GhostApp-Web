@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["php82", "php82Extensions.pdo_mysql", "php82Extensions.curl", "php82Extensions.mbstring", "nodejs_20"]
+
+[phases.build]
+cmds = ["npm install"]
+
+[start]
+cmd = "concurrently \"php -S 0.0.0.0:$PORT\" \"node bot/index.js\""
