@@ -4,6 +4,7 @@ class User {
     private $table_name = "users";
 
     public $id;
+    public $username;
     public $email;
     public $password;
     public $created_at;
@@ -30,14 +31,38 @@ class User {
         return false;
     }
 
-    // Tworzenie nowego użytkownika
-    public function create() {
-        $query = "INSERT INTO " . $this->table_name . " SET email = :email, password = :password";
+    // Sprawdzenie czy username już istnieje
+    public function usernameExists() {
+        $query = "SELECT id FROM " . $this->table_name . " WHERE username = ? LIMIT 0,1";
         $stmt = $this->conn->prepare($query);
 
+        $this->username = htmlspecialchars(strip_tags($this->username));
+        $stmt->bindParam(1, $this->username);
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
+
+    // Walidacja siły hasła: min 1 mała, 1 duża, 1 cyfra, 1 znak specjalny
+    public static function validatePasswordStrength($password) {
+        if (!preg_match('/[a-z]/', $password)) return false;
+        if (!preg_match('/[A-Z]/', $password)) return false;
+        if (!preg_match('/[0-9]/', $password)) return false;
+        if (!preg_match('/[^a-zA-Z0-9]/', $password)) return false;
+        if (strlen($password) < 8) return false;
+        return true;
+    }
+
+    // Tworzenie nowego użytkownika
+    public function create() {
+        $query = "INSERT INTO " . $this->table_name . " SET username = :username, email = :email, password = :password";
+        $stmt = $this->conn->prepare($query);
+
+        $this->username = htmlspecialchars(strip_tags($this->username));
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->password = htmlspecialchars(strip_tags($this->password));
 
+        $stmt->bindParam(':username', $this->username);
         $stmt->bindParam(':email', $this->email);
         
         // Hashowanie hasła za pomocą bcrypt

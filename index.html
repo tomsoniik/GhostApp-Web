@@ -80,6 +80,15 @@
           </div>
           
           <form id="auth-form" class="space-y-5" autocomplete="off">
+            <!-- USERNAME (visible only in register mode) -->
+            <div id="username-container" class="space-y-1 hidden">
+              <label data-i18n="auth.label.username" class="text-xs font-mono text-zinc-500 uppercase tracking-wider ml-1">Nazwa Użytkownika</label>
+              <div class="relative group">
+                <input id="username-input" type="text" autocomplete="off" data-lpignore="true" minlength="3" maxlength="24" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="ghost_user">
+                <div class="absolute inset-0 rounded-lg ring-1 ring-white/5 pointer-events-none group-hover:ring-white/10 transition-all"></div>
+              </div>
+            </div>
+
             <div class="space-y-1">
               <label data-i18n="auth.label.email" class="text-xs font-mono text-zinc-500 uppercase tracking-wider ml-1">E-Mail</label>
               <div class="relative group">
@@ -93,6 +102,21 @@
               <div class="relative group">
                 <input id="pass-input" type="password" autocomplete="new-password" data-lpignore="true" required class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono" placeholder="••••••••••••">
                 <div class="absolute inset-0 rounded-lg ring-1 ring-white/5 pointer-events-none group-hover:ring-white/10 transition-all"></div>
+              </div>
+              <!-- Password Strength Indicator (visible only in register mode) -->
+              <div id="pass-strength-container" class="hidden mt-2 space-y-2">
+                <div class="flex gap-1">
+                  <div id="str-bar-1" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
+                  <div id="str-bar-2" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
+                  <div id="str-bar-3" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
+                  <div id="str-bar-4" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <p id="req-lower" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.lower">mała litera (a-z)</span></p>
+                  <p id="req-upper" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.upper">duża litera (A-Z)</span></p>
+                  <p id="req-digit" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.digit">cyfra (0-9)</span></p>
+                  <p id="req-special" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.special">znak specjalny (!@#$)</span></p>
+                </div>
               </div>
             </div>
 
@@ -241,24 +265,42 @@
             
             <!-- VIEW: EVENTS -->
             <div id="view-events" class="p-8">
-            <!-- Stats Row -->
-            <div class="grid grid-cols-3 gap-6 mb-8">
-              <div class="glass-panel p-5">
+            <!-- Stats Row (Live) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8" id="stats-grid">
+              <!-- Today's Actions -->
+              <div class="glass-panel p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-primary/50 via-primary/20 to-transparent"></div>
                 <p data-i18n="dash.stats.actions" class="text-xs font-mono text-zinc-500 mb-1">Dzisiejsze Akcje</p>
-                <p class="text-3xl font-display text-white">124</p>
+                <p class="text-3xl font-display text-white" id="stat-today-actions">
+                  <span class="inline-block w-16 h-8 bg-zinc-800 rounded animate-pulse"></span>
+                </p>
+                <p class="text-[10px] font-mono text-zinc-600 mt-1" id="stat-total-label"></p>
               </div>
-              <div class="glass-panel p-5">
+              <!-- Efficiency -->
+              <div class="glass-panel p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-primary/50 via-primary/20 to-transparent"></div>
                 <p data-i18n="dash.stats.efficiency" class="text-xs font-mono text-zinc-500 mb-1">Skuteczność Auto-odpowiedzi</p>
-                <p class="text-3xl font-display text-primary">98.5%</p>
+                <p class="text-3xl font-display text-primary" id="stat-efficiency">
+                  <span class="inline-block w-20 h-8 bg-zinc-800 rounded animate-pulse"></span>
+                </p>
+                <p class="text-[10px] font-mono text-zinc-600 mt-1" id="stat-efficiency-detail"></p>
               </div>
-              <div class="glass-panel p-5 flex flex-col justify-center">
-                <div class="flex justify-between items-center text-sm">
-                  <span class="text-zinc-400">Discord</span>
-                  <span data-i18n="dash.stats.connected" class="text-discord font-bold">Połączony</span>
-                </div>
-                <div class="flex justify-between items-center text-sm mt-2">
-                  <span class="text-zinc-400">Steam</span>
-                  <span data-i18n="dash.stats.connected" class="text-steamLight font-bold">Połączony</span>
+              <!-- Active Rules -->
+              <div class="glass-panel p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-white/20 via-white/5 to-transparent"></div>
+                <p data-i18n="dash.stats.rules" class="text-xs font-mono text-zinc-500 mb-1">Aktywne Reguły</p>
+                <p class="text-3xl font-display text-white" id="stat-active-rules">
+                  <span class="inline-block w-10 h-8 bg-zinc-800 rounded animate-pulse"></span>
+                </p>
+              </div>
+              <!-- Platform Status -->
+              <div class="glass-panel p-5 flex flex-col justify-center relative overflow-hidden group" id="stat-platforms-card">
+                <div class="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-discord/50 via-discord/10 to-transparent"></div>
+                <div id="stat-platforms-list">
+                  <div class="flex justify-between items-center text-sm">
+                    <span class="text-zinc-400">Discord</span>
+                    <span class="inline-block w-16 h-4 bg-zinc-800 rounded animate-pulse"></span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -106,12 +106,78 @@ function setupAuth() {
   const verificationContainer = document.getElementById('verification-container');
   const codeInput = document.getElementById('code-input') as HTMLInputElement;
 
+  // Username & Password elements
+  const usernameContainer = document.getElementById('username-container');
+  const usernameInput = document.getElementById('username-input') as HTMLInputElement;
   const emailInput = document.getElementById('email-input') as HTMLInputElement;
   const passInput = document.getElementById('pass-input') as HTMLInputElement;
+  const passStrengthContainer = document.getElementById('pass-strength-container');
+
+  // Password strength bar & requirement elements
+  const strBars = [
+    document.getElementById('str-bar-1'),
+    document.getElementById('str-bar-2'),
+    document.getElementById('str-bar-3'),
+    document.getElementById('str-bar-4'),
+  ];
+  const reqLower = document.getElementById('req-lower');
+  const reqUpper = document.getElementById('req-upper');
+  const reqDigit = document.getElementById('req-digit');
+  const reqSpecial = document.getElementById('req-special');
 
   let isLoginMode = true;
   let isCaptchaVerified = false;
-  let registrationStep = 1; // 1: Email+Pass+Captcha -> 2: Code Verification
+  let registrationStep = 1; // 1: Username+Email+Pass+Captcha -> 2: Code Verification
+
+  // Password validation logic
+  function validatePassword(password: string): { lower: boolean; upper: boolean; digit: boolean; special: boolean; score: number } {
+    const lower = /[a-z]/.test(password);
+    const upper = /[A-Z]/.test(password);
+    const digit = /[0-9]/.test(password);
+    const special = /[^a-zA-Z0-9]/.test(password);
+    const score = [lower, upper, digit, special].filter(Boolean).length;
+    return { lower, upper, digit, special, score };
+  }
+
+  function updatePassStrengthUI(password: string) {
+    const { lower, upper, digit, special, score } = validatePassword(password);
+    
+    const colorMap: Record<number, string> = { 0: 'bg-zinc-800', 1: 'bg-red-500', 2: 'bg-orange-500', 3: 'bg-yellow-400', 4: 'bg-primary' };
+    const barColor = colorMap[score] || 'bg-zinc-800';
+    
+    strBars.forEach((bar, i) => {
+      if (!bar) return;
+      bar.className = `h-1 flex-1 rounded-full transition-colors duration-300 ${i < score ? barColor : 'bg-zinc-800'}`;
+    });
+    
+    function setReq(el: HTMLElement | null, met: boolean) {
+      if (!el) return;
+      const dot = el.querySelector('span:first-child');
+      if (met) {
+        el.classList.remove('text-zinc-600');
+        el.classList.add('text-primary');
+        if (dot) { dot.classList.remove('bg-zinc-600'); dot.classList.add('bg-primary'); }
+      } else {
+        el.classList.remove('text-primary');
+        el.classList.add('text-zinc-600');
+        if (dot) { dot.classList.remove('bg-primary'); dot.classList.add('bg-zinc-600'); }
+      }
+    }
+    
+    setReq(reqLower, lower);
+    setReq(reqUpper, upper);
+    setReq(reqDigit, digit);
+    setReq(reqSpecial, special);
+  }
+
+  // Live password strength listener
+  if (passInput) {
+    passInput.addEventListener('input', () => {
+      if (!isLoginMode && registrationStep === 1) {
+        updatePassStrengthUI(passInput.value);
+      }
+    });
+  }
 
   function resetRegistrationState() {
     registrationStep = 1;
@@ -120,6 +186,9 @@ function setupAuth() {
     if (captchaError) captchaError.classList.add('hidden');
     if (mockCaptcha) mockCaptcha.classList.remove('pointer-events-none', 'opacity-80');
     if (codeInput) codeInput.value = '';
+    if (usernameInput) usernameInput.value = '';
+    if (usernameContainer) usernameContainer.classList.add('hidden');
+    if (passStrengthContainer) passStrengthContainer.classList.add('hidden');
     if (emailInput) {
       emailInput.parentElement!.parentElement!.classList.remove('hidden');
     }
@@ -171,6 +240,8 @@ function setupAuth() {
       
       if (captchaContainer) captchaContainer.classList.add('hidden');
       if (verificationContainer) verificationContainer.classList.add('hidden');
+      if (usernameContainer) usernameContainer.classList.add('hidden');
+      if (passStrengthContainer) passStrengthContainer.classList.add('hidden');
       
       // Pokaz pola na wypadek powrotu z 2 kroku rejestracji
       if (emailInput) emailInput.parentElement!.parentElement!.classList.remove('hidden');
@@ -178,6 +249,7 @@ function setupAuth() {
       if (emailInput) emailInput.required = true;
       if (passInput) passInput.required = true;
       if (codeInput) codeInput.required = false;
+      if (usernameInput) usernameInput.required = false;
 
     } else {
       if (registrationStep === 1) {
@@ -186,10 +258,16 @@ function setupAuth() {
         btnText.innerText = t('auth.register.btn');
         if (captchaContainer) captchaContainer.classList.remove('hidden');
         if (verificationContainer) verificationContainer.classList.add('hidden');
+        if (usernameContainer) usernameContainer.classList.remove('hidden');
+        if (passStrengthContainer) passStrengthContainer.classList.remove('hidden');
         
         if (emailInput) emailInput.required = true;
         if (passInput) passInput.required = true;
         if (codeInput) codeInput.required = false;
+        if (usernameInput) usernameInput.required = true;
+        
+        // Reset strength UI
+        updatePassStrengthUI(passInput?.value || '');
 
       } else if (registrationStep === 2) {
         formTitle.innerText = t('auth.verify.title');
@@ -198,12 +276,15 @@ function setupAuth() {
         
         if (captchaContainer) captchaContainer.classList.add('hidden');
         if (verificationContainer) verificationContainer.classList.remove('hidden');
+        if (usernameContainer) usernameContainer.classList.add('hidden');
+        if (passStrengthContainer) passStrengthContainer.classList.add('hidden');
         if (emailInput) emailInput.parentElement!.parentElement!.classList.add('hidden');
         if (passInput) passInput.parentElement!.parentElement!.classList.add('hidden');
         
         if (emailInput) emailInput.required = false;
         if (passInput) passInput.required = false;
         if (codeInput) codeInput.required = true;
+        if (usernameInput) usernameInput.required = false;
       }
       
       toggleBtn.innerText = t('auth.toggle.toLog');
@@ -267,12 +348,30 @@ function setupAuth() {
           if (captchaError) captchaError.classList.remove('hidden');
           return;
         }
+        
+        // Validate password strength
+        const { score } = validatePassword(passInput.value);
+        if (score < 4) {
+          // Highlight the password field
+          passInput.classList.add('border-red-500/50');
+          passInput.focus();
+          setTimeout(() => passInput.classList.remove('border-red-500/50'), 2000);
+          return;
+        }
+        
+        // Validate username
+        if (!usernameInput.value || usernameInput.value.length < 3) {
+          usernameInput.classList.add('border-red-500/50');
+          usernameInput.focus();
+          setTimeout(() => usernameInput.classList.remove('border-red-500/50'), 2000);
+          return;
+        }
       }
 
       if (isLoginMode) {
         if (!emailInput.value || !passInput.value) return;
       } else if (registrationStep === 1) {
-        if (!emailInput.value || !passInput.value) return;
+        if (!usernameInput.value || !emailInput.value || !passInput.value) return;
       } else if (registrationStep === 2) {
         if (!codeInput.value) return;
       }
@@ -297,7 +396,7 @@ function setupAuth() {
           endpoint += '/register.php';
           // Zgodnie z docelowym flow mozna podac email, haslo i wpisany kod, 
           // choc backend (register.php) nie weryfikuje teraz faktycznie kodu (ale przyjmuje zgloszenie rejestracji)
-          payload = { email: emailInput.value, password: passInput.value, code: codeInput.value };
+          payload = { username: usernameInput.value, email: emailInput.value, password: passInput.value, code: codeInput.value };
         }
         
         const response = await fetch(endpoint, {
@@ -407,6 +506,9 @@ function initDashboard() {
 
   // Fetch real logs from API (replace mock data)
   loadDashboardLogs();
+
+  // Fetch live stats
+  loadDashboardStats();
 }
 
 async function loadDashboardLogs() {
@@ -517,6 +619,130 @@ function formatTimeAgo(dateStr: string): string {
   if (diffH < 24) return `${diffH}h`;
   const diffD = Math.floor(diffH / 24);
   return `${diffD}d`;
+}
+
+function animateCountUp(el: HTMLElement, target: number, suffix: string = '') {
+  const duration = 800;
+  const start = performance.now();
+  const from = 0;
+
+  function step(now: number) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // easeOutExpo
+    const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+    const current = Math.round(from + (target - from) * eased);
+    el.textContent = current + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+let statsInterval: ReturnType<typeof setInterval> | null = null;
+
+async function loadDashboardStats() {
+  const API_BASE = '/api';
+  const userId = 1; // TODO: From JWT
+
+  const statActions = document.getElementById('stat-today-actions');
+  const statTotalLabel = document.getElementById('stat-total-label');
+  const statEfficiency = document.getElementById('stat-efficiency');
+  const statEffDetail = document.getElementById('stat-efficiency-detail');
+  const statRules = document.getElementById('stat-active-rules');
+  const statPlatforms = document.getElementById('stat-platforms-list');
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/stats/get.php?user_id=${userId}`);
+      if (!res.ok) throw new Error('API niedostępne');
+      const data = await res.json();
+
+      // Today's Actions
+      if (statActions) {
+        animateCountUp(statActions, data.today_actions);
+      }
+      if (statTotalLabel) {
+        statTotalLabel.textContent = `${t('dash.stats.total')}: ${data.total_actions}`;
+      }
+
+      // Efficiency
+      if (statEfficiency) {
+        animateCountUp(statEfficiency, data.efficiency, '%');
+      }
+      if (statEffDetail) {
+        statEffDetail.textContent = `${data.auto_replies_7d}/${data.total_events_7d} (7d)`;
+      }
+
+      // Active Rules
+      if (statRules) {
+        animateCountUp(statRules, data.active_rules);
+      }
+
+      // Platform statuses
+      if (statPlatforms) {
+        const platformConfig: Record<string, { label: string; colorClass: string }> = {
+          discord:   { label: 'Discord',   colorClass: 'text-discord' },
+          steam:     { label: 'Steam',     colorClass: 'text-steamLight' },
+          messenger: { label: 'Messenger', colorClass: 'text-messenger' },
+        };
+
+        // Always show Discord, plus any other connected platforms
+        const platformNames = new Set(['discord', ...Object.keys(data.platforms || {})]);
+        let html = '';
+
+        platformNames.forEach(name => {
+          const cfg = platformConfig[name] || { label: name, colorClass: 'text-zinc-400' };
+          const info = data.platforms?.[name];
+          const isActive = info?.status === 'active';
+          const statusText = isActive ? t('dash.stats.connected') : t('dash.stats.disconnected');
+          const statusColor = isActive ? cfg.colorClass : 'text-zinc-600';
+          const dotColor = isActive ? 'bg-green-500' : 'bg-zinc-700';
+
+          html += `
+            <div class="flex justify-between items-center text-sm ${html ? 'mt-2' : ''}">
+              <span class="text-zinc-400 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span>
+                ${cfg.label}
+              </span>
+              <span class="${statusColor} font-bold text-xs">${statusText}</span>
+            </div>
+          `;
+        });
+
+        statPlatforms.innerHTML = html;
+      }
+
+    } catch (_err) {
+      // Fallback — pokaż zera zamiast skeleton
+      if (statActions) statActions.textContent = '0';
+      if (statEfficiency) statEfficiency.textContent = '0%';
+      if (statRules) statRules.textContent = '0';
+      if (statTotalLabel) statTotalLabel.textContent = '';
+      if (statEffDetail) statEffDetail.textContent = '';
+      if (statPlatforms) {
+        statPlatforms.innerHTML = `
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-zinc-400 flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
+              Discord
+            </span>
+            <span class="text-zinc-600 font-bold text-xs">${t('dash.stats.disconnected')}</span>
+          </div>
+        `;
+      }
+    }
+  };
+
+  // Initial fetch
+  fetchStats();
+
+  // Auto-refresh every 15s
+  if (statsInterval) clearInterval(statsInterval);
+  statsInterval = setInterval(() => {
+    if (!document.getElementById('view-events')?.classList.contains('hidden')) {
+      fetchStats();
+    }
+  }, 15000);
 }
 
 function checkAuthAndRoute() {

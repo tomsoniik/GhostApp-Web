@@ -24,3 +24,4 @@ bot/.env
 *.sln
 *.sw?
 bot/
+AI_INSTRUCTIONS.md
