@@ -902,6 +902,61 @@ function setupConfigActions() {
     setTimeout(toggleAfkVisibility, 100);
   }
 
+  const afkSaveBtn = document.getElementById('afk-save-btn') as HTMLButtonElement;
+  if (afkSaveBtn) {
+    afkSaveBtn.addEventListener('click', async () => {
+      const afkEnabled = afkEnabledCheckbox?.checked ? 1 : 0;
+      const afkMessage = afkMessageInput?.value || '';
+
+      const originalText = afkSaveBtn.innerHTML;
+      afkSaveBtn.innerHTML = 'Zapisywanie...';
+      afkSaveBtn.disabled = true;
+      afkSaveBtn.classList.add('opacity-50');
+
+      try {
+        const response = await fetch('/api/discord/save_afk.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: 1, // TODO: From JWT
+            afk_enabled: afkEnabled,
+            afk_message: afkMessage
+          })
+        });
+
+        if (response.ok) {
+          afkSaveBtn.innerHTML = 'Zapisano!';
+          afkSaveBtn.classList.replace('bg-yellow-500/20', 'bg-green-500/20');
+          afkSaveBtn.classList.replace('text-yellow-500', 'text-green-400');
+          afkSaveBtn.classList.replace('border-yellow-500/30', 'border-green-500/30');
+          
+          setTimeout(() => {
+            afkSaveBtn.innerHTML = originalText;
+            afkSaveBtn.disabled = false;
+            afkSaveBtn.classList.remove('opacity-50');
+            afkSaveBtn.classList.replace('bg-green-500/20', 'bg-yellow-500/20');
+            afkSaveBtn.classList.replace('text-green-400', 'text-yellow-500');
+            afkSaveBtn.classList.replace('border-green-500/30', 'border-yellow-500/30');
+          }, 2000);
+        } else {
+          afkSaveBtn.innerHTML = 'Błąd!';
+          setTimeout(() => {
+            afkSaveBtn.innerHTML = originalText;
+            afkSaveBtn.disabled = false;
+            afkSaveBtn.classList.remove('opacity-50');
+          }, 2000);
+        }
+      } catch (err) {
+        afkSaveBtn.innerHTML = 'Błąd!';
+        setTimeout(() => {
+          afkSaveBtn.innerHTML = originalText;
+          afkSaveBtn.disabled = false;
+          afkSaveBtn.classList.remove('opacity-50');
+        }, 2000);
+      }
+    });
+  }
+
   if (discordSaveBtn) {
     discordSaveBtn.addEventListener('click', async () => {
       const token = discordTokenInput?.value;
