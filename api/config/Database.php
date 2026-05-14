@@ -1,10 +1,18 @@
 <?php
 class Database {
-    private $host = "viaduct.proxy.rlwy.net";
-    private $port = 18369;
-    private $db_name = "railway";
-    private $username = "root";
-    private $password = "GPbWNoQKDNBXwPfYyjhBnPNsTlQlgpwh";
+    private $host;
+    private $port;
+    private $db_name;
+    private $username;
+    private $password;
+
+    public function __construct() {
+        $this->host = getenv('MYSQLHOST') ?: "localhost";
+        $this->port = getenv('MYSQLPORT') ?: "3306";
+        $this->db_name = getenv('MYSQLDATABASE') ?: "armessage_db";
+        $this->username = getenv('MYSQLUSER') ?: "root";
+        $this->password = getenv('MYSQLPASSWORD') ?: "";
+    }
     public $conn;
 
     public function getConnection() {
