@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/Database.php';
 
 $database = new Database();
 $db = $database->getConnection();
