@@ -836,7 +836,7 @@ function setupConfigActions() {
   // Wczytaj zapisane klucze przy ładowaniu
   const fetchConfig = async () => {
     try {
-      const res = await fetch(API_BASE_URL + "/config/get_platforms.php?user_id=1');
+      const res = await fetch(API_BASE_URL + "/config/get_platforms.php?user_id=1");
       const platforms = await res.json();
       
       if (platforms['discord']) {
@@ -916,7 +916,7 @@ function setupConfigActions() {
       afkSaveBtn.classList.add('opacity-50');
 
       try {
-        const response = await fetch(API_BASE_URL + "/discord/save_afk.php', {
+        const response = await fetch(API_BASE_URL + "/discord/save_afk.php", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -977,7 +977,7 @@ function setupConfigActions() {
       discordSaveBtn.classList.add('opacity-50');
 
       try {
-        const response = await fetch(API_BASE_URL + "/discord/connect.php', {
+        const response = await fetch(API_BASE_URL + "/discord/connect.php", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1063,7 +1063,7 @@ function setupRulesActions() {
 
     try {
       // user_id is hardcoded to 1 for now
-      const response = await fetch(API_BASE_URL + "/rules/get.php?user_id=1');
+      const response = await fetch(API_BASE_URL + "/rules/get.php?user_id=1");
       const rules = await response.json();
 
       if (rules.length === 0) {
@@ -1107,7 +1107,7 @@ function setupRulesActions() {
           if (!ruleId || !confirm('Na pewno chcesz usunąć tę regułę?')) return;
 
           try {
-            await fetch(API_BASE_URL + "/rules/delete.php', {
+            await fetch(API_BASE_URL + "/rules/delete.php", {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ id: ruleId, user_id: 1 })
@@ -1152,7 +1152,7 @@ function setupRulesActions() {
       btn.classList.add('opacity-50');
 
       try {
-        const res = await fetch(API_BASE_URL + "/rules/add.php', {
+        const res = await fetch(API_BASE_URL + "/rules/add.php", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
