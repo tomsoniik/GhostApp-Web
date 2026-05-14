@@ -113,17 +113,14 @@ function setupAuth() {
   const passInput = document.getElementById('pass-input') as HTMLInputElement;
   const passStrengthContainer = document.getElementById('pass-strength-container');
 
-  // Password strength bar & requirement elements
+  // Password strength bar & label
   const strBars = [
     document.getElementById('str-bar-1'),
     document.getElementById('str-bar-2'),
     document.getElementById('str-bar-3'),
     document.getElementById('str-bar-4'),
   ];
-  const reqLower = document.getElementById('req-lower');
-  const reqUpper = document.getElementById('req-upper');
-  const reqDigit = document.getElementById('req-digit');
-  const reqSpecial = document.getElementById('req-special');
+  const passStrengthLabel = document.getElementById('pass-strength-label');
 
   let isLoginMode = true;
   let isCaptchaVerified = false;
@@ -140,9 +137,10 @@ function setupAuth() {
   }
 
   function updatePassStrengthUI(password: string) {
-    const { lower, upper, digit, special, score } = validatePassword(password);
+    const { score } = validatePassword(password);
     
     const colorMap: Record<number, string> = { 0: 'bg-zinc-800', 1: 'bg-red-500', 2: 'bg-orange-500', 3: 'bg-yellow-400', 4: 'bg-primary' };
+    const textColorMap: Record<number, string> = { 0: 'text-zinc-600', 1: 'text-red-500', 2: 'text-orange-500', 3: 'text-yellow-400', 4: 'text-primary' };
     const barColor = colorMap[score] || 'bg-zinc-800';
     
     strBars.forEach((bar, i) => {
@@ -150,24 +148,12 @@ function setupAuth() {
       bar.className = `h-1 flex-1 rounded-full transition-colors duration-300 ${i < score ? barColor : 'bg-zinc-800'}`;
     });
     
-    function setReq(el: HTMLElement | null, met: boolean) {
-      if (!el) return;
-      const dot = el.querySelector('span:first-child');
-      if (met) {
-        el.classList.remove('text-zinc-600');
-        el.classList.add('text-primary');
-        if (dot) { dot.classList.remove('bg-zinc-600'); dot.classList.add('bg-primary'); }
-      } else {
-        el.classList.remove('text-primary');
-        el.classList.add('text-zinc-600');
-        if (dot) { dot.classList.remove('bg-primary'); dot.classList.add('bg-zinc-600'); }
-      }
+    if (passStrengthLabel) {
+      const labelKey = ['', 'auth.pass.s1', 'auth.pass.s2', 'auth.pass.s3', 'auth.pass.s4'][score] || '';
+      passStrengthLabel.textContent = password.length > 0 && labelKey ? t(labelKey) : '';
+      // Reset color classes
+      passStrengthLabel.className = `text-[10px] font-mono ml-0.5 transition-colors duration-300 ${textColorMap[score] || 'text-zinc-600'}`;
     }
-    
-    setReq(reqLower, lower);
-    setReq(reqUpper, upper);
-    setReq(reqDigit, digit);
-    setReq(reqSpecial, special);
   }
 
   // Live password strength listener

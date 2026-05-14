@@ -104,19 +104,14 @@
                 <div class="absolute inset-0 rounded-lg ring-1 ring-white/5 pointer-events-none group-hover:ring-white/10 transition-all"></div>
               </div>
               <!-- Password Strength Indicator (visible only in register mode) -->
-              <div id="pass-strength-container" class="hidden mt-2 space-y-2">
+              <div id="pass-strength-container" class="hidden mt-2 space-y-1.5">
                 <div class="flex gap-1">
                   <div id="str-bar-1" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
                   <div id="str-bar-2" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
                   <div id="str-bar-3" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
                   <div id="str-bar-4" class="h-1 flex-1 rounded-full bg-zinc-800 transition-colors duration-300"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-                  <p id="req-lower" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.lower">mała litera (a-z)</span></p>
-                  <p id="req-upper" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.upper">duża litera (A-Z)</span></p>
-                  <p id="req-digit" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.digit">cyfra (0-9)</span></p>
-                  <p id="req-special" class="text-[10px] font-mono text-zinc-600 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-zinc-600 inline-block"></span> <span data-i18n="auth.pass.special">znak specjalny (!@#$)</span></p>
-                </div>
+                <p id="pass-strength-label" class="text-[10px] font-mono text-zinc-600 ml-0.5 transition-colors duration-300"></p>
               </div>
             </div>
 
