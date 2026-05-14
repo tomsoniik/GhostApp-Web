@@ -336,34 +336,40 @@
                       
                       <div class="flex flex-col md:flex-row gap-3 mb-4">
                         <div class="relative flex-1">
-                          <input type="password" id="discord-token-input" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-discord/50 transition-colors font-mono placeholder-zinc-600" placeholder="NTEy... (User Token)">
+                          <input type="password" id="discord-token-input" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-discord/50 focus:ring-1 focus:ring-discord/50 transition-all font-mono placeholder-zinc-600 shadow-inner" placeholder="Wklej User Token (NTEy...)">
                         </div>
-                        <select id="discord-scope-select" class="bg-black/50 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-discord/50 transition-colors cursor-pointer appearance-none min-w-[180px]">
-                          <option value="dm_only">Tylko DM</option>
-                          <option value="all">Wszystkie (DM + Serwery)</option>
+                        <select id="discord-scope-select" class="bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-discord/50 focus:ring-1 focus:ring-discord/50 transition-all cursor-pointer min-w-[180px] shadow-inner">
+                          <option value="dm_only">Tylko Prywatne (DM)</option>
+                          <option value="all">Wszędzie (DM + Serwery)</option>
                         </select>
                         <button id="discord-save-btn" class="px-6 py-2.5 bg-discord/20 hover:bg-discord text-white border border-discord/30 hover:border-discord rounded-lg text-sm font-semibold transition-all shadow-[0_0_15px_rgba(88,101,242,0)] hover:shadow-[0_0_15px_rgba(88,101,242,0.4)] shrink-0">
-                          Zapisz Token
+                          Zapisz Ustawienia
                         </button>
                       </div>
 
                       <!-- AI Config Section -->
                       <div class="mt-6 pt-6 border-t border-white/5 space-y-4">
-                        <div class="flex items-center gap-3 mb-2">
-                          <input type="checkbox" id="discord-ai-enabled" class="w-4 h-4 accent-brand bg-black/50 border-white/10 rounded cursor-pointer">
-                          <label for="discord-ai-enabled" class="text-sm font-medium text-white cursor-pointer flex items-center gap-2">
-                            <span class="text-brand">✨</span> Włącz Google Gemini AI (Odpowiada gdy brakuje reguł)
+                        <div class="flex items-center justify-between bg-black/30 border border-white/5 rounded-xl p-4 transition-colors hover:bg-black/40">
+                          <div>
+                            <label for="discord-ai-enabled" class="text-sm font-bold text-white cursor-pointer flex items-center gap-2 mb-1">
+                              <span class="text-brand">✨</span> Google Gemini AI
+                            </label>
+                            <p class="text-xs text-zinc-400">Automatycznie generuje naturalne odpowiedzi, gdy brakuje dopasowanych reguł.</p>
+                          </div>
+                          <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" id="discord-ai-enabled" class="sr-only peer">
+                            <div class="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-300 peer-checked:after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
                           </label>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div id="discord-ai-settings" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 transition-all duration-300 opacity-50 pointer-events-none">
                           <div>
-                            <label class="block text-xs font-medium text-zinc-500 mb-1">Google Gemini API Key</label>
-                            <input type="password" id="discord-ai-key-input" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-brand/50 transition-colors font-mono placeholder-zinc-700" placeholder="AIzaSy...">
+                            <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider ml-1">Klucz API Gemini</label>
+                            <input type="password" id="discord-ai-key-input" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all font-mono placeholder-zinc-600 shadow-inner" placeholder="AIzaSy...">
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-zinc-500 mb-1">Zachowanie Bota (Prompt systemowy)</label>
-                            <input type="text" id="discord-ai-prompt-input" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-brand/50 transition-colors placeholder-zinc-700" placeholder="np. Jesteś asystentem. Odpowiadaj krótko i na luzie.">
+                            <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider ml-1">Zachowanie (System Prompt)</label>
+                            <input type="text" id="discord-ai-prompt-input" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/50 transition-all placeholder-zinc-600 shadow-inner" placeholder="np. Jesteś asystentem. Odpowiadaj krótko.">
                           </div>
                         </div>
                       </div>

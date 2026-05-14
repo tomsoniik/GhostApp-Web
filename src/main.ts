@@ -859,6 +859,23 @@ function setupConfigActions() {
 
   fetchConfig();
 
+  // Handle AI section visibility
+  const aiSettingsBox = document.getElementById('discord-ai-settings');
+  const toggleAiVisibility = () => {
+    if (!aiSettingsBox || !aiEnabledCheckbox) return;
+    if (aiEnabledCheckbox.checked) {
+      aiSettingsBox.classList.remove('opacity-50', 'pointer-events-none');
+    } else {
+      aiSettingsBox.classList.add('opacity-50', 'pointer-events-none');
+    }
+  };
+
+  if (aiEnabledCheckbox) {
+    aiEnabledCheckbox.addEventListener('change', toggleAiVisibility);
+    // Initial check
+    setTimeout(toggleAiVisibility, 100);
+  }
+
   if (discordSaveBtn) {
     discordSaveBtn.addEventListener('click', async () => {
       const token = discordTokenInput?.value;
