@@ -4,8 +4,8 @@ import './components/GhostSidebar';
 import './components/GhostLangSwitcher';
 import { initI18n, t } from './i18n';
 
-// CONFIG: Base URL for API calls
-const API_BASE_URL = 'https://ghostapp-production.up.railway.app/api';
+// CONFIG: Base URL for API calls (API na Vercelu zgodnie z AI_INSTRUCTIONS.md)
+const API_BASE_URL = 'https://ghost-app-web.vercel.app/api';
 
 function setupBackground() {
   // Mouse Glow Tracking
