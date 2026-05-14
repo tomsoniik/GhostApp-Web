@@ -864,7 +864,7 @@ function setupConfigActions() {
         }
       }
     } catch (err) {
-      console.error('Nie udało się wczytać konfiguracji');
+      console.error('Nie udało się wczytać konfiguracji:', err);
     }
   };
 

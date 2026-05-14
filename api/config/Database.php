@@ -26,11 +26,16 @@ class Database {
         $this->password = getenv('MYSQLPASSWORD') ?: "";
 
         try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name . ";charset=utf8mb4", $this->username, $this->password);
+            $dsn = "mysql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name . ";charset=utf8mb4";
+            $this->conn = new PDO($dsn, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
-            // W logach zobaczymy błąd połączenia
-            error_log("Błąd połączenia z bazą: " . $exception->getMessage());
+            // Zapisz błąd w logach Vercela, żebyśmy mogli go odczytać
+            error_log("GHOST_DB_ERROR: " . $exception->getMessage());
+            // Zwróć błąd jako JSON, żeby frontend go widział
+            header('Content-Type: application/json');
+            echo json_encode(["error" => "Database connection failed: " . $exception->getMessage()]);
+            exit;
         }
 
         return $this->conn;
