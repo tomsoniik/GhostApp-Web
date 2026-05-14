@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "start": "php -S 0.0.0.0:$PORT & node bot/index.js"
+    "start": "concurrently \"php -S 0.0.0.0:$PORT\" \"node bot/index.js\""
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",
@@ -18,6 +18,7 @@
     "vite": "^8.0.12"
   },
   "dependencies": {
+    "concurrently": "^9.2.1",
     "discord.js-selfbot-v13": "^3.7.1",
     "dotenv": "^17.4.2",
     "mysql2": "^3.22.3"
