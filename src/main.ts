@@ -886,7 +886,6 @@ function setupConfigActions() {
   }
 
   // Handle AFK section visibility
-  const afkEnabledCheckbox = document.getElementById('afk-enabled') as HTMLInputElement;
   const afkSettingsBox = document.getElementById('afk-settings');
   const toggleAfkVisibility = () => {
     if (!afkSettingsBox || !afkEnabledCheckbox) return;
