@@ -876,6 +876,24 @@ function setupConfigActions() {
     setTimeout(toggleAiVisibility, 100);
   }
 
+  // Handle AFK section visibility
+  const afkEnabledCheckbox = document.getElementById('afk-enabled') as HTMLInputElement;
+  const afkSettingsBox = document.getElementById('afk-settings');
+  const toggleAfkVisibility = () => {
+    if (!afkSettingsBox || !afkEnabledCheckbox) return;
+    if (afkEnabledCheckbox.checked) {
+      afkSettingsBox.classList.remove('opacity-50', 'pointer-events-none');
+    } else {
+      afkSettingsBox.classList.add('opacity-50', 'pointer-events-none');
+    }
+  };
+
+  if (afkEnabledCheckbox) {
+    afkEnabledCheckbox.addEventListener('change', toggleAfkVisibility);
+    // Initial check
+    setTimeout(toggleAfkVisibility, 100);
+  }
+
   if (discordSaveBtn) {
     discordSaveBtn.addEventListener('click', async () => {
       const token = discordTokenInput?.value;

@@ -49,7 +49,7 @@ export const translations: Record<string, Record<string, string>> = {
     'auth.robot': 'Nie jestem robotem',
     // Dashboard
     'dash.sidebar.events': 'Dziennik Zdarzeń',
-    'dash.sidebar.rules': 'Reguły Auto-Respondera',
+    'dash.sidebar.rules': 'Automatyzacje',
     'dash.sidebar.nodes': 'Konfiguracja',
     'dash.sidebar.logout': 'Wyloguj (Zniszcz Sesję)',
     'dash.topbar.title': 'Dziennik Zdarzeń (Inbox)',
@@ -128,7 +128,7 @@ export const translations: Record<string, Record<string, string>> = {
     'auth.robot': 'I am not a robot',
     // Dashboard
     'dash.sidebar.events': 'Event Log',
-    'dash.sidebar.rules': 'Auto-Responder Rules',
+    'dash.sidebar.rules': 'Automations',
     'dash.sidebar.nodes': 'Config',
     'dash.sidebar.logout': 'Log Out (Destroy Session)',
     'dash.topbar.title': 'Event Log (Inbox)',
@@ -207,7 +207,7 @@ export const translations: Record<string, Record<string, string>> = {
     'auth.robot': 'Я не робот',
     // Dashboard
     'dash.sidebar.events': 'Журнал событий',
-    'dash.sidebar.rules': 'Правила автоответчика',
+    'dash.sidebar.rules': 'Автоматизация',
     'dash.sidebar.nodes': 'Конфигурация',
     'dash.sidebar.logout': 'Выйти (Уничтожить сессию)',
     'dash.topbar.title': 'Журнал событий (Inbox)',
