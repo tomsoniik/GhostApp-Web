@@ -37,7 +37,8 @@ try {
     $stmt->execute([$email, $code, $expiresAt]);
 
     // ─── Wysyłka maila przez Brevo API ───
-    $BREVO_API_KEY = 'xsmtpsib-052468208b762fa680c38fc58bfc9e73cf155974abd2bb056b90ac5aa8c3c240-zV3JHRUtBvKMuwzo';
+    // Klucz pobierany ze zmiennych środowiskowych Railway (Environment Variables)
+    $BREVO_API_KEY = getenv('BREVO_API_KEY'); 
     
     // TODO: Zmień na swój zweryfikowany email w Brevo!
     $senderEmail = 'debskitomal@gmail.com'; 
