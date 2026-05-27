@@ -60,7 +60,7 @@ class User {
 
         $this->username = htmlspecialchars(strip_tags($this->username));
         $this->email = htmlspecialchars(strip_tags($this->email));
-        $this->password = htmlspecialchars(strip_tags($this->password));
+        // Hasło NIE jest modyfikowane przed hashowaniem (celowo)
 
         $stmt->bindParam(':username', $this->username);
         $stmt->bindParam(':email', $this->email);

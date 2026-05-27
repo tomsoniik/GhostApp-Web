@@ -7,6 +7,14 @@ import { initI18n, t } from './i18n';
 // CONFIG: Base URL for API calls (API na Vercelu zgodnie z AI_INSTRUCTIONS.md)
 const API_BASE_URL = 'https://ghost-app-web.vercel.app/api';
 
+// Helper: build Authorization headers for authenticated API calls
+function authHeaders(): Record<string, string> {
+  const token = localStorage.getItem('ar_auth_token');
+  return token
+    ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+    : { 'Content-Type': 'application/json' };
+}
+
 function setupBackground() {
   // Mouse Glow Tracking
   const mouseGlow = document.getElementById('mouse-glow');
@@ -416,6 +424,7 @@ function setupAuth() {
             setTimeout(() => {
               if (isLoginMode && data.token) {
                 localStorage.setItem('ar_auth_token', data.token);
+                if (data.user_id) localStorage.setItem('ar_user_id', String(data.user_id));
                 window.dispatchEvent(new CustomEvent('auth-state-changed'));
                 // SPA Routing: instead of redirect, load dashboard inline
                 closeModal();
@@ -470,6 +479,7 @@ function initDashboard() {
   // Logout Logic — listen on custom event dispatched by GhostSidebar component
   window.addEventListener('ghost-logout', () => {
     localStorage.removeItem('ar_auth_token');
+    localStorage.removeItem('ar_user_id');
     if (dashboardView) dashboardView.classList.add('hidden');
     if (landingView) landingView.classList.remove('hidden');
     document.title = 'GhostApp | Home';
@@ -503,12 +513,10 @@ async function loadDashboardLogs() {
   const logContainer = document.getElementById('log-container');
   if (!logContainer) return;
 
-  // TODO: docelowo user_id z tokenu JWT, na razie 1
-  const userId = 1;
-  const API_BASE = API_BASE_URL;
-
   try {
-    const res = await fetch(`${API_BASE}/logs/list.php?user_id=${userId}&limit=50`);
+    const res = await fetch(`${API_BASE_URL}/logs/list.php?limit=50`, {
+      headers: authHeaders()
+    });
     
     if (!res.ok) throw new Error('API niedostępne');
     
@@ -629,9 +637,6 @@ function animateCountUp(el: HTMLElement, target: number, suffix: string = '') {
 let statsInterval: ReturnType<typeof setInterval> | null = null;
 
 async function loadDashboardStats() {
-  const API_BASE = '/api';
-  const userId = 1; // TODO: From JWT
-
   const statActions = document.getElementById('stat-today-actions');
   const statTotalLabel = document.getElementById('stat-total-label');
   const statEfficiency = document.getElementById('stat-efficiency');
@@ -641,7 +646,9 @@ async function loadDashboardStats() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch(`${API_BASE}/stats/get.php?user_id=${userId}`);
+      const res = await fetch(`${API_BASE_URL}/stats/get.php`, {
+        headers: authHeaders()
+      });
       if (!res.ok) throw new Error('API niedostępne');
       const data = await res.json();
 
@@ -836,7 +843,9 @@ function setupConfigActions() {
   // Wczytaj zapisane klucze przy ładowaniu
   const fetchConfig = async () => {
     try {
-      const res = await fetch(API_BASE_URL + "/config/get_platforms.php?user_id=1");
+      const res = await fetch(API_BASE_URL + "/config/get_platforms.php", {
+        headers: authHeaders()
+      });
       const platforms = await res.json();
       
       if (platforms['discord']) {
@@ -918,9 +927,8 @@ function setupConfigActions() {
       try {
         const response = await fetch(API_BASE_URL + "/discord/save_afk.php", {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders(),
           body: JSON.stringify({
-            user_id: 1, // TODO: From JWT
             afk_enabled: afkEnabled,
             afk_message: afkMessage
           })
@@ -979,9 +987,8 @@ function setupConfigActions() {
       try {
         const response = await fetch(API_BASE_URL + "/discord/connect.php", {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders(),
           body: JSON.stringify({
-            user_id: 1, // TODO: From JWT
             bot_token: token,
             bot_scope: scope,
             ai_enabled: aiEnabled,
@@ -1063,7 +1070,9 @@ function setupRulesActions() {
 
     try {
       // user_id is hardcoded to 1 for now
-      const response = await fetch(API_BASE_URL + "/rules/get.php?user_id=1");
+      const response = await fetch(API_BASE_URL + "/rules/get.php", {
+        headers: authHeaders()
+      });
       const rules = await response.json();
 
       if (rules.length === 0) {
@@ -1109,8 +1118,8 @@ function setupRulesActions() {
           try {
             await fetch(API_BASE_URL + "/rules/delete.php", {
               method: 'DELETE',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id: ruleId, user_id: 1 })
+              headers: authHeaders(),
+              body: JSON.stringify({ id: ruleId })
             });
             fetchRules();
           } catch (err) {
@@ -1154,9 +1163,8 @@ function setupRulesActions() {
       try {
         const res = await fetch(API_BASE_URL + "/rules/add.php", {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders(),
           body: JSON.stringify({
-            user_id: 1,
             platform_name: platform,
             trigger_keyword: trigger,
             reply_text: reply
@@ -1193,7 +1201,9 @@ function setupLogsActions() {
 
   const fetchLogs = async () => {
     try {
-      const res = await fetch(API_BASE_URL + "/logs/get.php?user_id=1");
+      const res = await fetch(API_BASE_URL + "/logs/get.php", {
+        headers: authHeaders()
+      });
       const logs = await res.json();
 
       if (logs.length === 0) {

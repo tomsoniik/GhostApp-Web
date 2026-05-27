@@ -1,26 +1,24 @@
 <?php
 // POST /api/discord/connect — zapisz bot token w user_platforms
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+require_once __DIR__ . '/../cors.php';
 header("Content-Type: application/json; charset=UTF-8");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
-
 include_once __DIR__ . '/../config/Database.php';
+include_once __DIR__ . '/../auth/auth_helper.php';
 
 $database = new Database();
 $conn = $database->getConnection();
 
+$userId = authenticateUser($conn);
+
 $data = json_decode(file_get_contents("php://input"));
 
-if (!$data || empty($data->user_id) || empty($data->bot_token)) {
+if (!$data || empty($data->bot_token)) {
     http_response_code(400);
-    echo json_encode(["error" => "user_id i bot_token są wymagane"]);
+    echo json_encode(["error" => "bot_token jest wymagany"]);
     exit;
 }
 
-$userId = (int)$data->user_id;
 $botToken = trim($data->bot_token);
 $botScope = !empty($data->bot_scope) ? trim($data->bot_scope) : 'all';
 

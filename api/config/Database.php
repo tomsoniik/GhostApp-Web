@@ -30,11 +30,9 @@ class Database {
             $this->conn = new PDO($dsn, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
-            // Zapisz błąd w logach Vercela, żebyśmy mogli go odczytać
             error_log("GHOST_DB_ERROR: " . $exception->getMessage());
-            // Zwróć błąd jako JSON, żeby frontend go widział
             header('Content-Type: application/json');
-            echo json_encode(["error" => "Database connection failed: " . $exception->getMessage()]);
+            echo json_encode(["error" => "Błąd połączenia z bazą danych. Spróbuj ponownie później."]);
             exit;
         }
 

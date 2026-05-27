@@ -1,25 +1,16 @@
 <?php
-// GET /api/logs/list.php?user_id=X&limit=50 — pobierz logi zdarzeń
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+// GET /api/logs/list.php?limit=50 — pobierz logi zdarzeń
+require_once __DIR__ . '/../cors.php';
 header("Content-Type: application/json; charset=UTF-8");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
-
 include_once __DIR__ . '/../config/Database.php';
+include_once __DIR__ . '/../auth/auth_helper.php';
 
 $database = new Database();
 $conn = $database->getConnection();
 
-$userId = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
+$userId = authenticateUser($conn);
 $limit = isset($_GET['limit']) ? min((int)$_GET['limit'], 100) : 50;
-
-if ($userId <= 0) {
-    http_response_code(400);
-    echo json_encode(["error" => "user_id jest wymagany"]);
-    exit;
-}
 
 try {
     $stmt = $conn->prepare("

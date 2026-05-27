@@ -1,15 +1,14 @@
 <?php
-header('Access-Control-Allow-Origin: *');
+require_once __DIR__ . '/../cors.php';
 header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: GET');
-header('Access-Control-Allow-Headers: Content-Type');
 
 require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../auth/auth_helper.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$user_id = isset($_GET['user_id']) ? $_GET['user_id'] : die(json_encode(["error" => "Brak user_id"]));
+$user_id = authenticateUser($db);
 
 $query = "SELECT id, platform, event_type, source_user, source_channel, trigger_keyword, original_message, reply_sent, created_at 
           FROM event_logs 

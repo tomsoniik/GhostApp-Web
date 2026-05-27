@@ -1,24 +1,15 @@
 <?php
-// GET /api/stats/get.php?user_id=X — live statystyki dashboardu
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+// GET /api/stats/get.php — live statystyki dashboardu
+require_once __DIR__ . '/../cors.php';
 header("Content-Type: application/json; charset=UTF-8");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
-
 include_once __DIR__ . '/../config/Database.php';
+include_once __DIR__ . '/../auth/auth_helper.php';
 
 $database = new Database();
 $conn = $database->getConnection();
 
-$userId = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
-
-if ($userId <= 0) {
-    http_response_code(400);
-    echo json_encode(["error" => "user_id jest wymagany"]);
-    exit;
-}
+$userId = authenticateUser($conn);
 
 try {
     // 1. Dzisiejsze akcje (event_logs z dzisiaj)
